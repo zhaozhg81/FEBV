@@ -1,0 +1,146 @@
+
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> source("../R/F_Functions.R")
+> source("../R/F_Finite_Bayes.R")
+> G <- 1000
+> numSim <- 500
+> n <- 6
+> a <- 10
+> b <- 1
+> prior <- 3
+> PLOT=FALSE
+> 
+> F_FinBayes(G, numSim, n, prior, a, b, PLOT)
+[1] "Mon May 10 13:52:32 2021"
+[1] "number of simulation:10"
+[1] "Mon May 10 13:53:55 2021"
+[1] "number of simulation:20"
+[1] "Mon May 10 13:55:22 2021"
+[1] "number of simulation:30"
+[1] "Mon May 10 13:57:00 2021"
+[1] "number of simulation:40"
+[1] "Mon May 10 13:58:21 2021"
+[1] "number of simulation:50"
+[1] "Mon May 10 13:59:57 2021"
+[1] "number of simulation:60"
+[1] "Mon May 10 14:01:31 2021"
+[1] "number of simulation:70"
+[1] "Mon May 10 14:02:53 2021"
+[1] "number of simulation:80"
+[1] "Mon May 10 14:04:22 2021"
+[1] "number of simulation:90"
+[1] "Mon May 10 14:05:53 2021"
+[1] "number of simulation:100"
+[1] "Mon May 10 14:07:31 2021"
+[1] "number of simulation:110"
+[1] "Mon May 10 14:08:56 2021"
+[1] "number of simulation:120"
+[1] "Mon May 10 14:10:27 2021"
+[1] "number of simulation:130"
+[1] "Mon May 10 14:11:57 2021"
+[1] "number of simulation:140"
+[1] "Mon May 10 14:13:30 2021"
+[1] "number of simulation:150"
+[1] "Mon May 10 14:15:04 2021"
+[1] "number of simulation:160"
+[1] "Mon May 10 14:16:28 2021"
+[1] "number of simulation:170"
+[1] "Mon May 10 14:17:48 2021"
+[1] "number of simulation:180"
+[1] "Mon May 10 14:19:29 2021"
+[1] "number of simulation:190"
+[1] "Mon May 10 14:20:58 2021"
+[1] "number of simulation:200"
+[1] "Mon May 10 14:22:19 2021"
+[1] "number of simulation:210"
+[1] "Mon May 10 14:23:35 2021"
+[1] "number of simulation:220"
+[1] "Mon May 10 14:24:40 2021"
+[1] "number of simulation:230"
+[1] "Mon May 10 14:25:48 2021"
+[1] "number of simulation:240"
+[1] "Mon May 10 14:27:05 2021"
+[1] "number of simulation:250"
+[1] "Mon May 10 14:28:25 2021"
+[1] "number of simulation:260"
+[1] "Mon May 10 14:29:34 2021"
+[1] "number of simulation:270"
+[1] "Mon May 10 14:30:53 2021"
+[1] "number of simulation:280"
+[1] "Mon May 10 14:32:07 2021"
+[1] "number of simulation:290"
+[1] "Mon May 10 14:33:10 2021"
+[1] "number of simulation:300"
+[1] "Mon May 10 14:34:19 2021"
+[1] "number of simulation:310"
+[1] "Mon May 10 14:35:30 2021"
+[1] "number of simulation:320"
+[1] "Mon May 10 14:36:45 2021"
+[1] "number of simulation:330"
+[1] "Mon May 10 14:38:03 2021"
+[1] "number of simulation:340"
+[1] "Mon May 10 14:39:22 2021"
+[1] "number of simulation:350"
+[1] "Mon May 10 14:40:39 2021"
+[1] "number of simulation:360"
+[1] "Mon May 10 14:41:49 2021"
+[1] "number of simulation:370"
+[1] "Mon May 10 14:43:09 2021"
+[1] "number of simulation:380"
+[1] "Mon May 10 14:44:36 2021"
+[1] "number of simulation:390"
+[1] "Mon May 10 14:46:04 2021"
+[1] "number of simulation:400"
+[1] "Mon May 10 14:47:23 2021"
+[1] "number of simulation:410"
+[1] "Mon May 10 14:48:47 2021"
+[1] "number of simulation:420"
+[1] "Mon May 10 14:50:10 2021"
+[1] "number of simulation:430"
+[1] "Mon May 10 14:51:35 2021"
+[1] "number of simulation:440"
+[1] "Mon May 10 14:52:48 2021"
+[1] "number of simulation:450"
+[1] "Mon May 10 14:54:04 2021"
+[1] "number of simulation:460"
+[1] "Mon May 10 14:55:24 2021"
+[1] "number of simulation:470"
+[1] "Mon May 10 14:56:44 2021"
+[1] "number of simulation:480"
+[1] "Mon May 10 14:58:05 2021"
+[1] "number of simulation:490"
+[1] "Mon May 10 14:59:23 2021"
+[1] "number of simulation:500"
+> 
+> 
+> ## #-- Setting Parameters -------------------------------------------------------------------------------------------------------------
+> 
+> ## prior   <- 1      # Prior:  1=IG, 2=Lognormal, 3=Gamma, 4=IGMix, 5=GamMix
+> ## a       <- 3
+> ## b       <- 1
+> 
+> 
+> 
+> 
+> proc.time()
+    user   system  elapsed 
+4886.522  621.120 4116.842 

@@ -1,0 +1,430 @@
+F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE)
+{
+
+  
+
+  if(PLOT==FALSE)
+  {
+    
+    ## ##-- Setting Parameters ----------------------------------------------------------------------------------------------------------------------------------------------
+    
+    ## G       <- 1000   # Dimension
+    ## numSim  <- 500    # The number of simulation
+    ## N       <- 1      # Number of ticks for X-axis
+    ## n       <- 4      # Sample size  (df=n-1)
+    
+    ##-- Indep Core ------------------------------------------------------------------------------------------------------------------------------------------------------
+    N <- 1
+    df      <- n-1   # Degree of Freedom
+    mu      <- 0     # Mean of prior distrubution
+    alpha   <- 0.05
+    
+    GAM     <- 0
+    INVGAM  <- 0
+    LNORM   <- 0
+    MIXIG   <- 0
+    MIXGAM  <- 0
+    
+    Ncol    <- 13
+    theta   <- array(0, G)
+    sigmaSq <- array(0, G)
+    bon     <- array(0, G)
+    sSq     <- array(0, G)
+    ljs     <- array(0, G)
+    opt     <- array(0, G)
+    smy     <- array(0, G)
+    vsh     <- array(0, G)
+    feb     <- array(0, G)
+    fes     <- array(0, G)
+    Feb     <- array(0, G)
+    
+    sSq0     <- array(0, numSim)
+    ljs0     <- array(0, numSim)
+    opt0     <- array(0, numSim)
+    smy0     <- array(0, numSim)
+    vsh0     <- array(0, numSim)
+    feb0     <- array(0, numSim)
+    fes0     <- array(0, numSim)
+    Feb0     <- array(0, numSim)
+    
+    f00      <- array(0, numSim)
+    f10      <- array(0, numSim)
+    f20      <- array(0, numSim)
+    
+    
+    tsse1.sSq <- array(0, c(numSim,N)) 
+    tsse1.ljs <- array(0, c(numSim,N))
+    tsse1.opt <- array(0, c(numSim,N))
+    tsse1.smy <- array(0, c(numSim,N))
+    tsse1.vsh <- array(0, c(numSim,N))
+    tsse1.feb <- array(0, c(numSim,N))
+    tsse1.fes <- array(0, c(numSim,N))
+    tsse1.Feb <- array(0, c(numSim,N))
+
+    tsse2.sSq <- array(0, c(numSim,N))
+    tsse2.ljs <- array(0, c(numSim,N))
+    tsse2.opt <- array(0, c(numSim,N))
+    tsse2.smy <- array(0, c(numSim,N))
+    tsse2.vsh <- array(0, c(numSim,N))
+    tsse2.feb <- array(0, c(numSim,N))
+    tsse2.fes <- array(0, c(numSim,N))
+    tsse2.Feb <- array(0, c(numSim,N))
+
+    
+    tsse0.sSq <- array(0, c(numSim,N))
+    tsse0.ljs <- array(0, c(numSim,N))
+    tsse0.opt <- array(0, c(numSim,N))
+    tsse0.smy <- array(0, c(numSim,N))
+    tsse0.vsh <- array(0, c(numSim,N))
+    tsse0.feb <- array(0, c(numSim,N))
+    tsse0.fes <- array(0, c(numSim,N))
+    tsse0.Feb <- array(0, c(numSim,N))
+    
+    tssep.sSq <- array(0, c(numSim,N))
+    tssep.ljs <- array(0, c(numSim,N))
+    tssep.opt <- array(0, c(numSim,N))
+    tssep.smy <- array(0, c(numSim,N))
+    tssep.vsh <- array(0, c(numSim,N))
+    tssep.feb <- array(0, c(numSim,N))
+    tssep.fes <- array(0, c(numSim,N))
+    tssep.Feb <- array(0, c(numSim,N))
+    
+    
+    M=seq(0,1,0.999/N)
+    M=M[2:(N+1)]
+    
+    if (prior==1){
+      INVGAM=1
+    } else if (prior==2){
+      LNORM=1
+    } else if (prior==3){
+      GAM=1
+    } else if (prior==4){
+      MIXIG=1
+    } else if (prior==5){
+      MIXGAM=1
+    }
+    
+    ##-- Simulation ---------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+    for(t in  1:N){
+      print( paste("t=",t,sep=""))
+      for(i in  1:numSim){
+        if( i%% 10==0 ){
+          print(date())
+          print( paste( "number of simulation:", i, sep="") )
+        }
+        temp       <- runif(G)
+        if(INVGAM==1)
+          sigmaSq    <- 1/rgamma(G,abs(a),b)
+        if(LNORM==1)
+          sigmaSq <- rlnorm(G,a,b)
+        if(GAM==1)
+          sigmaSq <- rgamma(G,abs(a),b)
+        if(MIXIG==1)
+          sigmaSq <- (temp>0.5)*1/rgamma(G,a,b)+(temp<0.5)*1/rgamma(G,6,4)
+        if(MIXGAM==1)
+          sigmaSq <- (temp>0.5)*rgamma(G,4,16)+(temp<0.5)*rgamma(G,a,b)
+        
+        sSq        <- sigmaSq*rchisq(G,df)/df
+        
+        if( i==1 )
+          {
+            bandwidth <- array(0, 3)
+            bandwidth[1] <- h.ucv(sSq, deriv.order=0)$h
+            bandwidth[2] <- h.ucv(sSq, deriv.order=1)$h
+            bandwidth[3] <- h.ucv(sSq, deriv.order=2)$h                
+          }
+        
+        bon        <- sSq
+        sSq        <- sSq
+        ljs        <- LJS(sSq,df)
+        smy        <- SMY(sSq,df)
+        vsh        <- VSH(sSq,df)
+        opt        <- OPT(sSq,df)
+        feb        <- fEB(sSq,df,bandwidth)
+        fes        <- fES(sSq,df,bandwidth)
+        Feb        <- FEB(sSq,df)
+        
+        ## New observation
+        temp       <- runif(1)
+        if(INVGAM==1)
+          sigmaSq0    <- 1/rgamma(1,abs(a),b)
+        if(LNORM==1)
+          sigmaSq0 <- rlnorm(1,a,b)
+        if(GAM==1)
+          sigmaSq0 <- rgamma(1,abs(a),b)
+        if(MIXIG==1)
+          sigmaSq0 <- (temp>0.5)*1/rgamma(1,a,b)+(temp<0.5)*1/rgamma(1,6,4)
+        if(MIXGAM==1)
+          sigmaSq0 <- (temp>0.5)*rgamma(1,4,16)+(temp<0.5)*rgamma(1,a,b)
+        
+        sSq0[i]    <- sigmaSq0*rchisq(1,df)/df
+        
+        sSq_ext    <- c(sSq,sSq0[i])
+        
+        ## LJS
+        B0 <-LJST(sSq,df)[1]; a00 <- LJST(sSq,df)[2]
+        
+        ## TW    
+        OPTT_vec   <- OPTT(sSq,df)
+        sSqpool0   <- OPTT_vec[1]
+        ahat0      <- OPTT_vec[2]
+        nsSqpool0  <- OPTT_vec[3]
+        nahat0     <- OPTT_vec[4]
+        opt0_temp  <- ((hf(df,1,G)*sSqpool0 )^ahat0 )*(hf(df,1,1)*sSq0[i]^(1-ahat0))
+        
+    
+        ## fEBV, fEBVS
+        f00[i]   <- dkde(sSq,sSq0[i],deriv.order=0, h=bandwidth[1])[[8]]
+        f10[i]   <- dkde(sSq,sSq0[i],deriv.order=1, h=bandwidth[2])[[8]]
+        f20[i]   <- dkde(sSq,sSq0[i],deriv.order=2, h=bandwidth[3])[[8]]
+        
+        ## Smyth
+        s0    <- squeezeVar(sSq, df)$var.prior
+        d0    <- squeezeVar(sSq, df)$df.prior
+        if (is.infinite(d0)) d0=1000000
+        
+        ## Estimator for New obs.
+        
+        ljs0[i]  <- B0*(sSq0[i]^(1-a00))*(sSq0[i]^a00)
+        opt0[i]  <- ((hf(df,1,G)*nsSqpool0)^nahat0)*(hf(df,1,1)*opt0_temp^(1-nahat0))
+        smy0[i]  <- (d0*s0+df*sSq0[i])/(d0+df)
+        vsh0[i]  <- VSH(sSq_ext,df)[(G+1)]
+        feb0[i]  <- ifelse(((df-2)/(df*sSq0[i])-2/df*(f10[i]/max(f00[i],0.00001)))^{-1}<0,sSq0[i],((df-2)/(df*sSq0[i])-2/df*(f10[i]/max(f00[i],0.00001)))^{-1})
+        fes0[i]  <- (df*(df-2)*sSq0[i]*f00[i]-2*df*sSq0[i]^2*f10[i])/(4*sSq0[i]^2*f20[i]-4*(df-2)*sSq0[i]*f10[i]+df*(df-2)*f00[i])
+        Feb0[i]  <- FEB(sSq_ext,df)[(G+1)]
+        
+        if ((df*(df-2)*sSq0[i]*f00[i]-2*df*sSq0[i]^2*f10[i])/(4*sSq0[i]^2*f20[i]-4*(df-2)*sSq0[i]*f10[i]+df*(df-2)*f00[i])<=0) fes0[i] <- sSq0[i]
+        
+        if (abs(4*sSq0[i]^2*f20[i]-4*(df-2)*sSq0[i]*f10[i]+df*(df-2)*f00[i])<0.00001) fes0[i] <- abs(df*(df-2)*sSq0[i]*f00[i]-2*df*sSq0[i]^2*f10[i])*10000
+   
+        
+        ##----------------------------------------------------------------------------------------------------    
+        ## L0
+        tsse0.sSq[i,t] <-(mean((sSq0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.ljs[i,t] <-(mean((ljs0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.opt[i,t] <-(mean((opt0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.smy[i,t] <-(mean((smy0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.vsh[i,t] <-(mean((vsh0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.feb[i,t] <-(mean((feb0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.fes[i,t] <-(mean((fes0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.Feb[i,t] <-(mean((Feb0[i]-sigmaSq0)^2,na.rm=T))  
+    
+        ##L1p
+        tssep.sSq[i,t] <-(mean((sSq0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.ljs[i,t] <-(mean((ljs0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.opt[i,t] <-(mean((opt0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.smy[i,t] <-(mean((smy0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.vsh[i,t] <-(mean((vsh0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.feb[i,t] <-(mean((feb0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.fes[i,t] <-(mean((fes0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.Feb[i,t] <-(mean((Feb0[i]/sigmaSq0-1)^2,na.rm=T))
+        
+        ##L1
+        tsse1.sSq[i,t] <-(mean((sigmaSq0/sSq0[i]-1)^2,na.rm=T))
+        tsse1.ljs[i,t] <-(mean((sigmaSq0/ljs0[i]-1)^2,na.rm=T))
+        tsse1.opt[i,t] <-(mean((sigmaSq0/opt0[i]-1)^2,na.rm=T))
+        tsse1.smy[i,t] <-(mean((sigmaSq0/smy0[i]-1)^2,na.rm=T))
+        tsse1.vsh[i,t] <-(mean((sigmaSq0/vsh0[i]-1)^2,na.rm=T))
+        tsse1.feb[i,t] <-(mean((sigmaSq0/feb0[i]-1)^2,na.rm=T))
+        tsse1.fes[i,t] <-(mean((sigmaSq0/fes0[i]-1)^2,na.rm=T))
+        tsse1.Feb[i,t] <-(mean((sigmaSq0/Feb0[i]-1)^2,na.rm=T))
+    
+        ##L2
+        tsse2.sSq[i,t] <-(mean((sSq0[i]/sigmaSq0-log(sSq0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.ljs[i,t] <-(mean((ljs0[i]/sigmaSq0-log(ljs0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.opt[i,t] <-(mean((opt0[i]/sigmaSq0-log(opt0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.smy[i,t] <-(mean((smy0[i]/sigmaSq0-log(smy0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.vsh[i,t] <-(mean((vsh0[i]/sigmaSq0-log(vsh0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.feb[i,t] <-(mean((feb0[i]/sigmaSq0-log(feb0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.fes[i,t] <-(mean((fes0[i]/sigmaSq0-log(fes0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.Feb[i,t] <-(mean((Feb0[i]/sigmaSq0-log(Feb0[i]/sigmaSq0)-1),na.rm=T))
+        
+      }
+      
+    }
+    
+    tmse0.sSq<-apply(tsse0.sSq,2,mean);  tmse1.sSq<-apply(tsse1.sSq,2,mean); tmse2.sSq<-apply(tsse2.sSq,2,mean);  tmsep.sSq<-apply(tssep.sSq,2,mean);
+    tmse0.ljs<-apply(tsse0.ljs,2,mean);  tmse1.ljs<-apply(tsse1.ljs,2,mean); tmse2.ljs<-apply(tsse2.ljs,2,mean);  tmsep.ljs<-apply(tssep.ljs,2,mean); 
+    tmse0.opt<-apply(tsse0.opt,2,mean);  tmse1.opt<-apply(tsse1.opt,2,mean); tmse2.opt<-apply(tsse2.opt,2,mean);  tmsep.opt<-apply(tssep.opt,2,mean); 
+    tmse0.smy<-apply(tsse0.smy,2,mean);  tmse1.smy<-apply(tsse1.smy,2,mean); tmse2.smy<-apply(tsse2.smy,2,mean);  tmsep.smy<-apply(tssep.smy,2,mean); 
+    tmse0.vsh<-apply(tsse0.vsh,2,mean);  tmse1.vsh<-apply(tsse1.vsh,2,mean); tmse2.vsh<-apply(tsse2.vsh,2,mean);  tmsep.vsh<-apply(tssep.vsh,2,mean); 
+    tmse0.feb<-apply(tsse0.feb,2,mean);  tmse1.feb<-apply(tsse1.feb,2,mean); tmse2.feb<-apply(tsse2.feb,2,mean);  tmsep.feb<-apply(tssep.feb,2,mean); 
+    tmse0.fes<-apply(tsse0.fes,2,mean);  tmse1.fes<-apply(tsse1.fes,2,mean); tmse2.fes<-apply(tsse2.fes,2,mean);  tmsep.fes<-apply(tssep.fes,2,mean); 
+    tmse0.Feb<-apply(tsse0.Feb,2,mean);  tmse1.Feb<-apply(tsse1.Feb,2,mean); tmse2.Feb<-apply(tsse2.Feb,2,mean);  tmsep.Feb<-apply(tssep.Feb,2,mean); 
+    
+    
+    tmsd0.sSq<-apply(tsse0.sSq,2,sd);  tmsd1.sSq<-apply(tsse1.sSq,2,sd); tmsd2.sSq<-apply(tsse2.sSq,2,sd);  tmsdp.sSq<-apply(tssep.sSq,2,sd);
+    tmsd0.ljs<-apply(tsse0.ljs,2,sd);  tmsd1.ljs<-apply(tsse1.ljs,2,sd); tmsd2.ljs<-apply(tsse2.ljs,2,sd);  tmsdp.ljs<-apply(tssep.ljs,2,sd); 
+    tmsd0.opt<-apply(tsse0.opt,2,sd);  tmsd1.opt<-apply(tsse1.opt,2,sd); tmsd2.opt<-apply(tsse2.opt,2,sd);  tmsdp.opt<-apply(tssep.opt,2,sd); 
+    tmsd0.smy<-apply(tsse0.smy,2,sd);  tmsd1.smy<-apply(tsse1.smy,2,sd); tmsd2.smy<-apply(tsse2.smy,2,sd);  tmsdp.smy<-apply(tssep.smy,2,sd); 
+    tmsd0.vsh<-apply(tsse0.vsh,2,sd);  tmsd1.vsh<-apply(tsse1.vsh,2,sd); tmsd2.vsh<-apply(tsse2.vsh,2,sd);  tmsdp.vsh<-apply(tssep.vsh,2,sd); 
+    tmsd0.feb<-apply(tsse0.feb,2,sd);  tmsd1.feb<-apply(tsse1.feb,2,sd); tmsd2.feb<-apply(tsse2.feb,2,sd);  tmsdp.feb<-apply(tssep.feb,2,sd); 
+    tmsd0.fes<-apply(tsse0.fes,2,sd);  tmsd1.fes<-apply(tsse1.fes,2,sd); tmsd2.fes<-apply(tsse2.fes,2,sd);  tmsdp.fes<-apply(tssep.fes,2,sd); 
+    tmsd0.Feb<-apply(tsse0.Feb,2,sd);  tmsd1.Feb<-apply(tsse1.Feb,2,sd); tmsd2.Feb<-apply(tsse2.Feb,2,sd);  tmsdp.Feb<-apply(tssep.Feb,2,sd); 
+    
+    
+    
+    L0  <-round(cbind(tmse0.sSq, tmse0.ljs, tmse0.opt, tmse0.smy, tmse0.vsh, tmse0.feb, tmse0.fes, tmse0.Feb),3)
+    L1  <-round(cbind(tmse1.sSq, tmse1.ljs, tmse1.opt, tmse1.smy, tmse1.vsh, tmse1.feb, tmse1.fes, tmse1.Feb),3)
+    L2  <-round(cbind(tmse2.sSq, tmse2.ljs, tmse2.opt, tmse2.smy, tmse2.vsh, tmse2.feb, tmse2.fes, tmse2.Feb),3)
+    Lp  <-round(cbind(tmsep.sSq, tmsep.ljs, tmsep.opt, tmsep.smy, tmsep.vsh, tmsep.feb, tmsep.fes, tmsep.Feb),3)
+    
+    Lsd0<-round(cbind(tmsd0.sSq, tmsd0.ljs, tmsd0.opt, tmsd0.smy, tmsd0.vsh, tmsd0.feb,  tmse0.fes, tmsd0.Feb),3)
+    Lsd1<-round(cbind(tmsd1.sSq, tmsd1.ljs, tmsd1.opt, tmsd1.smy, tmsd1.vsh, tmsd1.feb,  tmsd1.fes, tmsd1.Feb),3)
+    Lsd2<-round(cbind(tmsd2.sSq, tmsd2.ljs, tmsd2.opt, tmsd2.smy, tmsd2.vsh, tmsd2.feb,  tmsd2.fes, tmsd2.Feb),3)
+    Lsdp<-round(cbind(tmsdp.sSq, tmsdp.ljs, tmsdp.opt, tmsdp.smy, tmsdp.vsh, tmsdp.feb,  tmsdp.fes, tmsdp.Feb),3)
+    
+    L   <- rbind(L0, L1, L2, Lp)
+    Lsd <- rbind(Lsd0, Lsd1, Lsd2, Lsdp)
+    
+    ##-- Saving RData -------------------------------------------------------------------------------------------------------------------
+    
+    path      <- paste("./Data/")
+    path1     <- paste("./Figure/")
+    
+    settname  <- paste("FinBay_L0_prior_",prior,"_a_",a,"_b_",b,sep="")
+    filename  <- paste(path, settname, ".Rdata", sep="")
+    save(L0, file = filename)
+    
+    settname  <- paste("FinBay_L1_prior_",prior,"_a_",a,"_b_",b,sep="")
+    filename  <- paste(path, settname, ".Rdata", sep="")
+    save(L1, file = filename)
+    
+    settname  <- paste("FinBay_L2_prior_",prior,"_a_",a,"_b_",b,sep="")
+    filename  <- paste(path, settname, ".Rdata", sep="")
+    save(L2, file = filename)
+    
+    settname  <- paste("FinBay_Lp_prior_",prior,"_a_",a,"_b_",b,sep="")
+    filename  <- paste(path, settname, ".Rdata", sep="")
+    save(Lp, file = filename)
+    
+#------------------------------------------------------------------------------------------------------------#
+    
+  }
+  
+  if(PLOT==TRUE)
+    {
+      path      <- paste("./Data/")
+      path1     <- paste("./Figure/")
+      
+      settname  <- paste("FinBay_L0_prior_",prior,"_a_",a,"_b_",b,sep="")
+      filename  <- paste(path, settname, ".Rdata", sep="")
+      load(filename)
+      
+      settname  <- paste("FinBay_L1_prior_",prior,"_a_",a,"_b_",b,sep="")
+      filename  <- paste(path, settname, ".Rdata", sep="")
+      load(filename)
+      
+      settname  <- paste("FinBay_L2_prior_",prior,"_a_",a,"_b_",b,sep="")
+      filename  <- paste(path, settname, ".Rdata", sep="")
+      load(filename)
+      
+      
+    
+      settname  <- paste("FinBay_Lp_prior_",prior,"_a_",a,"_b_",b,sep="")
+      filename  <- paste(path, settname, ".Rdata", sep="")
+      load(filename)
+      
+    }
+
+  path1     <- paste("./Figure/")
+  ##-- Saving Figures ----------------------------------------------------------------------------------------------------------------------------
+  
+  if (prior==1){
+    PRIOR<-"Inverse Gamma"
+  } else if (prior==2){
+    PRIOR<-"Lognormal"
+  } else if (prior==3){
+    PRIOR<-"Gamma"
+  } else if (prior==4){
+    PRIOR<-"IG Mixture"
+  } else if (prior==5){
+    PRIOR<-"Gamma Mixture"
+  }
+  
+  par(mfrow=c(2,2))
+  namelist=c("sSq",	"ELJS",	"TW",	"Smyth",	"Vash",	"fEBV",	"fEBVS",	"FEBV")
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_L0.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(L0,10), ylab="log(MSE)", main=bquote(paste("Finite Bayes:",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_L1.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(L1,10), ylab="log(MSE)", main=bquote(paste("Finite Byaes:" ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_L2.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(L2,10), ylab="log(MSE)", main=bquote(paste("Finite Bayes:" ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_Lp.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(Lp,10), ylab="log(MSE)", main=bquote(paste("Finite Bayes:",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+  
+                                        ##-- Showing Figures ----------------------------------------------------------------------------------------------------------------------------
+  
+  par(mfrow=c(2,2))
+  barplot(log(L0,10), ylab="MSE (log_scale)", main=bquote(paste("[L0, Max]  ",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  barplot(log(L1,10), ylab="MSE (log_scale)", main=bquote(paste("[L1, 1%]  " ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  barplot(log(L2,10), ylab="MSE (log_scale)", main=bquote(paste("[L2, 5%]  " ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  barplot(log(Lp,10), ylab="MSE (log_scale)", main=bquote(paste("[Lp, All]  ",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  
+
+
+  ## #### Figures for papers.
+  
+  path1     <-"/home/zhaozhg/Dropbox/Apps/Overleaf/On F-modelling based Empirical Bayes Estimation of Variances/figure/"  
+  ##-- Saving Figures ----------------------------------------------------------------------------------------------------------------------------
+  
+  if (prior==1){
+    PRIOR<-"Inverse Gamma"
+  } else if (prior==2){
+    PRIOR<-"Lognormal"
+  } else if (prior==3){
+    PRIOR<-"Gamma"
+  } else if (prior==4){
+    PRIOR<-"IG Mixture"
+  } else if (prior==5){
+    PRIOR<-"Gamma Mixture"
+  }
+  
+  par(mfrow=c(2,2))
+  namelist=c("sSq",	"ELJS",	"TW",	"Smyth",	"Vash",	"fEBV",	"fEBVS",	"FEBV")
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_L0.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(L0,10), ylab="log(MSE)", main=bquote(paste("Finite Bayes:",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_L1.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(L1,10), ylab="log(MSE)", main=bquote(paste("Finite Byaes:" ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_L2.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(L2,10), ylab="log(MSE)", main=bquote(paste("Finite Bayes:" ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+  figurename1 <- paste(path1,"FinBay_",settname,"_Lp.pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  barplot(log(Lp,10), ylab="log(MSE)", main=bquote(paste("Finite Bayes:",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
+  dev.off()
+  
+}
+
+
+
+
+
+
+
+
+

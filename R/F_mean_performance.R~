@@ -1,0 +1,321 @@
+library(latex2exp)
+library(REBayes)
+
+F_mean_Comparison <- function(G, numSim, N, n, prior, a, b, bw='ucv', PLOT=FALSE)
+{
+  
+  if(PLOT==FALSE)
+    {
+      
+      ## G       <- 1000   # Dimension
+      ## numSim  <- 500  # The number of simulation
+      ## N       <- 20     # Number of ticks for X-axis
+      ## n       <- 4      # Sample size  (df=n-1)
+
+##-- Indep Core ------------------------------------------------------------------------------------------------------------------------------------------------------
+      
+      df      <- n-1   # Degree of Freedom
+      mu      <- 0     # Mean of prior distrubution
+      alpha   <- 0.05
+      
+      GAM     <-0
+      INVGAM  <-0
+      LNORM   <-0
+      MIXIG   <-0
+      MIXGAM  <-0
+      
+      Ncol    <- 13
+      theta   <- array(0, G)
+      sigmaSq <- array(0, G)
+      bon     <- array(0, G)
+      sSq     <- array(0, G)
+      ljs     <- array(0, G)
+      smy     <- array(0, G)
+      vsh     <- array(0, G)
+      feb     <- array(0, G)
+      fes     <- array(0, G)
+      Feb     <- array(0, G)
+      rebayes <- array(0, G)
+
+      sel.sSq.m       <- array(0, c(numSim,1))
+      sel.ljs.m       <- array(0, c(numSim,1))
+      sel.smy.m       <- array(0, c(numSim,1))
+      sel.vsh.m       <- array(0, c(numSim,1))
+      sel.opt.m       <- array(0, c(numSim,1))
+      sel.feb.m       <- array(0, c(numSim,1))
+      sel.fes.m       <- array(0, c(numSim,1))
+      sel.Feb.m       <- array(0, c(numSim,1))
+      sel.rebayes.m   <- array(0, c(numSim,1))
+      
+      tauSqhat.sSq                 <- array(0, numSim)
+      tauSqhat.ljs                 <- array(0, numSim)
+      tauSqhat.smy                 <- array(0, numSim)
+      tauSqhat.vsh                 <- array(0, numSim)
+      tauSqhat.opt                 <- array(0, numSim)
+      tauSqhat.feb                 <- array(0, numSim)
+      tauSqhat.fes                 <- array(0, numSim)
+      tauSqhat.Feb                 <- array(0, numSim)
+      tauSqhat.rebayes             <- array(0, numSim)
+
+                                        # bon.sel.unknown.Result   <- array(0, c(N, 4))
+                                        # sSq.sel.unknown.Result   <- array(0, c(N, 4))
+                                        # ljs.sel.unknown.Result   <- array(0, c(N, 4))
+                                        # smy.sel.unknown.Result   <- array(0, c(N, 4))
+                                        # vsh.sel.unknown.Result   <- array(0, c(N, 4))
+                                        # opt.sel.unknown.Result   <- array(0, c(N, 4))
+                                        # feb.sel.unknown.Result   <- array(0, c(N, 4))
+                                        # Feb.sel.unknown.Result   <- array(0, c(N, 4))
+      
+      bonR                     <- array(0, c(N, 1))
+      sSqR                     <- array(0, c(N, 1))
+      ljsR                     <- array(0, c(N, 1))
+      smyR                     <- array(0, c(N, 1))
+      vshR                     <- array(0, c(N, 1))
+      optR                     <- array(0, c(N, 1))
+      febR                     <- array(0, c(N, 1))
+      fesR                     <- array(0, c(N, 1))
+      FebR                     <- array(0, c(N, 1))
+      rebayesR                 <- array(0, c(N, 1))
+      
+      Result.unknown           <- array(0, c(N,33))
+      Result.avg.unknown       <- array(0, c(N,33))
+      
+      M=seq(0,1,0.999/N)
+      M=M[2:(N+1)]
+      
+      if (prior==1){
+        INVGAM=1
+      } else if (prior==2){
+        LNORM=1
+      } else if (prior==3){
+        GAM=1
+      } else if (prior==4){
+        MIXIG=1
+      } else if (prior==5){
+        MIXGAM=1
+      }
+      
+      
+      ##-- Simulation ---------------------------------------------------------------------------------------------------------------------------------------------------------
+      for(t in  1:N){
+        print( paste("t=",t,sep=""))
+        for(i in  1:numSim){
+          if( i%% 50==0 ){
+            print(date())
+            print( paste( "number of simulation:", i, sep="") )
+          }
+          temp       <- runif(G)
+          if(INVGAM==1)
+            sigmaSq    <- 1/rgamma(G,abs(a),b)
+          if(LNORM==1)
+            sigmaSq <- rlnorm(G,a,b)
+          if(GAM==1)
+            sigmaSq <- rgamma(G,abs(a),b)
+          if(MIXIG==1)
+            sigmaSq <- (temp>0.5)*1/rgamma(G,a,b)+(temp<0.5)*1/rgamma(G,6,4)
+          if(MIXGAM==1)
+            sigmaSq <- (temp>0.5)*rgamma(G,4,16)+(temp<0.5)*rgamma(G,a,b)
+          
+          tauSq      <- mean(sigmaSq)*M[t]/(1-M[t])
+          theta      <- rnorm(G,mu,sqrt(tauSq))
+          
+          sSq        <- sigmaSq*rchisq(G,df)/df
+          xi         <- rnorm(G,theta,sqrt(sigmaSq))
+          
+          muhat      <- mean(xi) #sum((xi/sSq))/sum(1/sSq)
+          T.stat     <- xi/sqrt(sSq)
+          max.ind    <- order(abs(T.stat),decreasing=TRUE)[((G/G):(perc*G/1))]
+
+          if( bw=='ucv')
+            {
+              if( i==1 )
+                {
+                  bandwidth <- array(0, 3)
+                  bandwidth[1] <- h.ucv(sSq, deriv.order=0)$h
+                  bandwidth[2] <- h.ucv(sSq, deriv.order=1)$h
+                  bandwidth[3] <- h.ucv(sSq, deriv.order=2)$h                
+                }
+            }else{
+              bandwidth <- array(0.6, 3)
+            }
+          
+          bon        <- sSq
+          sSq        <- sSq
+          ljs        <- LJS(sSq,df)
+          smy        <- SMY(sSq,df)
+          vsh        <- VSH(sSq,df)
+          opt        <- OPT(sSq,df)
+          feb        <- fEB(sSq,df,bandwidth)
+          fes        <- fES(sSq,df,bandwidth)
+          Feb        <- FEB(sSq,df)
+          rebayes    <- GVmix(sSq, array(df,G) )$dy
+          
+          
+          tauSqhat.sSq[i]<- tauSqfn(sSq,xi,muhat,trunc=FALSE)
+          tauSqhat.ljs[i]<- tauSqfn(ljs,xi,muhat,trunc=FALSE)
+          tauSqhat.smy[i]<- tauSqfn(smy,xi,muhat,trunc=FALSE)
+          tauSqhat.vsh[i]<- tauSqfn(vsh,xi,muhat,trunc=FALSE)
+          tauSqhat.opt[i]<- tauSqfn(opt,xi,muhat,trunc=FALSE)
+          tauSqhat.fes[i]<- tauSqfn(fes,xi,muhat,trunc=FALSE)
+          tauSqhat.feb[i]<- tauSqfn(feb,xi,muhat,trunc=FALSE)
+          tauSqhat.Feb[i]<- tauSqfn(Feb,xi,muhat,trunc=FALSE)
+          tauSqhat.rebayes[i]<- tauSqfn(rebayes,xi,muhat,trunc=FALSE)
+
+          
+          ## CI : tauSq unknown
+          
+          sSq.m  <- (tauSqhat.sSq[i])/(sSq+tauSqhat.sSq[i])*xi+(sSq)/(sSq+tauSqhat.sSq[i])*muhat
+          ljs.m  <- (tauSqhat.ljs[i])/(ljs+tauSqhat.ljs[i])*xi+(ljs)/(ljs+tauSqhat.ljs[i])*muhat
+          opt.m  <- (tauSqhat.opt[i])/(opt+tauSqhat.opt[i])*xi+(opt)/(opt+tauSqhat.opt[i])*muhat
+          smy.m  <- (tauSqhat.smy[i])/(smy+tauSqhat.smy[i])*xi+(smy)/(smy+tauSqhat.smy[i])*muhat
+          vsh.m  <- (tauSqhat.vsh[i])/(vsh+tauSqhat.vsh[i])*xi+(vsh)/(vsh+tauSqhat.vsh[i])*muhat
+          feb.m  <- (tauSqhat.feb[i])/(feb+tauSqhat.feb[i])*xi+(feb)/(feb+tauSqhat.feb[i])*muhat
+          fes.m  <- (tauSqhat.fes[i])/(feb+tauSqhat.fes[i])*xi+(fes)/(fes+tauSqhat.fes[i])*muhat
+          Feb.m  <- (tauSqhat.Feb[i])/(Feb+tauSqhat.Feb[i])*xi+(Feb)/(Feb+tauSqhat.Feb[i])*muhat
+          rebayes.m  <- (tauSqhat.rebayes[i])/(Feb+tauSqhat.rebayes[i])*xi+(Feb)/(Feb+tauSqhat.rebayes[i])*muhat
+          
+          dif.sSq.m <- (sSq.m-theta)^2
+          dif.ljs.m <- (ljs.m-theta)^2
+          dif.opt.m <- (opt.m-theta)^2
+          dif.smy.m <- (smy.m-theta)^2
+          dif.vsh.m <- (vsh.m-theta)^2
+          dif.feb.m <- (feb.m-theta)^2
+          dif.fes.m <- (feb.m-theta)^2
+          dif.Feb.m <- (Feb.m-theta)^2
+          dif.rebayes.m <- (rebayes.m-theta)^2
+          
+          
+          ## CI : tauSq unknown - selected
+          sel.sSq.m[i]   <- mean(dif.sSq.m[max.ind])
+          sel.ljs.m[i]   <- mean(dif.ljs.m[max.ind])
+          sel.opt.m[i]   <- mean(dif.opt.m[max.ind])
+          sel.smy.m[i]   <- mean(dif.smy.m[max.ind])
+          sel.vsh.m[i]   <- mean(dif.vsh.m[max.ind])
+          sel.feb.m[i]   <- mean(dif.feb.m[max.ind])
+          sel.fes.m[i]   <- mean(dif.fes.m[max.ind])
+          sel.Feb.m[i]   <- mean(dif.Feb.m[max.ind])
+          sel.rebayes.m[i]   <- mean(dif.rebayes.m[max.ind])
+       }
+        
+        sSqR[t]=mean(sel.sSq.m)#/mean(sel.Feb.m);
+        ljsR[t]=mean(sel.ljs.m)#/mean(sel.Feb.m);
+        optR[t]=mean(sel.opt.m)#/mean(sel.Feb.m);
+        smyR[t]=mean(sel.smy.m)#/mean(sel.Feb.m);
+        vshR[t]=mean(sel.vsh.m)#/mean(sel.Feb.m);
+        febR[t]=mean(sel.feb.m)#/mean(sel.Feb.m);
+        fesR[t]=mean(sel.fes.m)#/mean(sel.Feb.m);
+        FebR[t]=mean(sel.Feb.m)#/mean(sel.Feb.m);
+        rebayesR[t]=mean(sel.rebayes.m)#/mean(sel.Feb.m);
+        
+      }  
+ 
+      Result.unknown <-cbind(M, sSqR, ljsR, optR, smyR, vshR, febR, fesR, rebayesR, FebR)
+      
+      ##-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      ##-- Saving RData -------------------------------------------------------------------------------------------------------------------
+
+      path      <- paste("./Data/")
+      settname  <- paste("MeanComp_prior_",prior,"_df_",df,"_a_",a,"_b_",b,"_perc_",perc,sep="")
+      filename  <- paste(path, settname, ".Rdata", sep="")
+      save(Result.unknown, file = filename)
+      
+    }
+  
+  if(PLOT==TRUE)
+    {
+      ##-- Saving RData -------------------------------------------------------------------------------------------------------------------
+      
+      path      <- paste("./Data/")
+      settname  <- paste("MeanComp_prior_",prior,"_df_",df,"_a_",a,"_b_",b,"_perc_",perc,sep="")
+      filename  <- paste(path, settname, ".Rdata", sep="")
+      load(filename)     
+    }
+
+
+  
+  ##-- Saving Figures ----------------------------------------------------------------------------------------------------------------------------
+  
+  if (prior==1){
+    PRIOR<-"Inverse Gamma"
+  } else if (prior==2){
+    PRIOR<-"Lognormal"
+  } else if (prior==3){
+    PRIOR<-"Gamma"
+  } else if (prior==4){
+    PRIOR<-"IG Mixture"
+  } else if (prior==5){
+    PRIOR<-"Gamma Mixture"
+  }
+  
+  par(mar=c(4, 5, 3, 8))
+  xloc=-0.2
+  path1     <-"./Figure/"
+  
+  ## Comparison of Estimators for theta
+  figurename1 <- paste(path1,"MSE_mean_comp_",settname,".pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  par(mar=c(5,6,1,10) )
+  plot( Result.unknown[,1],Result.unknown[,2],xlab=TeX(r'($\tau^2/(\tau^2+E\sigma^2)$ )'),ylab=TeX(r'(MSE of $\theta_{(1)}$ )'), ylim=c(0,max(Result.unknown[,2])), xlim=c(0,1),col="white",main=bquote(paste(.(PRIOR), "    a=",.(a),",  b=",.(b),",  df=",.(df) )), cex.lab=1.2, cex.axis=1.2, cex.main=1.2)
+  lines( Result.unknown[,1],Result.unknown[,2], pch=3 , type="b", col="cyan3" ) # Bonferroni
+  lines( Result.unknown[,1],Result.unknown[,3], pch=15, type="b", col="blue"  ) # ELJS
+  lines( Result.unknown[,1],Result.unknown[,4], pch=7 , type="b", col="purple") # TW
+  lines( Result.unknown[,1],Result.unknown[,5], pch=17, type="b", col="green4") # Smyth
+  lines( Result.unknown[,1],Result.unknown[,6], pch=16, type="b", col="gold4" ) # Vash
+  lines( Result.unknown[,1],Result.unknown[,7], pch=9 , type="b", col="brown" ) # fEBV
+  lines( Result.unknown[,1],Result.unknown[,8], pch=8 , type="b", col="orange") # fEBVS
+  lines( Result.unknown[,1],Result.unknown[,9], pch=10, type="b", col="green ") # ReBayes
+  lines( Result.unknown[,1],Result.unknown[,10], pch=19, type="b", col="red"  ) # FEBV
+
+  if(prior <=3 )
+    {
+      par(xpd=TRUE)
+      legend("topright",horiz=F, inset = c(-0.3,0.2), legend=c("sSq","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS", "REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),pch=c(3,15,7,17,16,9,8,10, 19), ncol=1, lty=1:1, cex=1)
+    }
+  dev.off()
+
+  path1     <-"/home/zhaozhg/Dropbox/Apps/Overleaf/On F-modelling based Empirical Bayes Estimation of Variances/figure/"
+  
+  ## Comparison of Estimators for theta
+  figurename1 <- paste(path1,"MSE_mean_comp_",settname,".pdf",sep="")
+  pdf(figurename1,width=8,height=5)
+  par(mar=c(5,6,1,10) )
+  plot( Result.unknown[,1],Result.unknown[,2],xlab=TeX(r'($\tau^2/(\tau^2+E\sigma^2)$ )'),ylab=TeX(r'(MSE of $\theta_{(1)}$ )'), ylim=c(0,max(Result.unknown[,2])), xlim=c(0,1),col="white",main=bquote(paste(.(PRIOR), "    a=",.(a),",  b=",.(b),",  df=",.(df) )), cex.lab=1.2, cex.axis=1.2, cex.main=1.2)
+  lines( Result.unknown[,1],Result.unknown[,2], pch=3 , type="b", col="cyan3" ) # Bonferroni
+  lines( Result.unknown[,1],Result.unknown[,3], pch=15, type="b", col="blue"  ) # ELJS
+  lines( Result.unknown[,1],Result.unknown[,4], pch=7 , type="b", col="purple") # TW
+  lines( Result.unknown[,1],Result.unknown[,5], pch=17, type="b", col="green4") # Smyth
+  lines( Result.unknown[,1],Result.unknown[,6], pch=16, type="b", col="gold4" ) # Vash
+  lines( Result.unknown[,1],Result.unknown[,7], pch=9 , type="b", col="brown" ) # fEBV
+  lines( Result.unknown[,1],Result.unknown[,8], pch=8 , type="b", col="orange") # fEBVS
+  lines( Result.unknown[,1],Result.unknown[,9], pch=10, type="b", col="green ") # ReBayes
+  lines( Result.unknown[,1],Result.unknown[,10], pch=19, type="b", col="red"  ) # FEBV
+
+  if(prior <=3 )
+    {
+      par(xpd=TRUE)
+      legend("topright",horiz=F, inset = c(-0.3,0.2), legend=c("sSq","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS", "REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),pch=c(3,15,7,17,16,9,8,10, 19), ncol=1, lty=1:1, cex=1)
+    }
+  dev.off()  
+
+    
+  ##-- Showing Figures ----------------------------------------------------------------------------------------------------------------------------
+  par(mar=c(5,6,1,10) )
+  plot( Result.unknown[,1],Result.unknown[,2],xlab=TeX(r'($\tau^2/(\tau^2+E\sigma^2)$ )'),ylab=TeX(r'(MSE of $\theta_{(1)}$ )'), ylim=c(0,max(Result.unknown[,2])), xlim=c(0,1),col="white",main=bquote(paste(.(PRIOR), "    a=",.(a),",  b=",.(b),",  df=",.(df) )), cex.lab=1.2, cex.axis=1.2, cex.main=1.2)
+  lines( Result.unknown[,1],Result.unknown[,2], pch=3 , type="b", col="cyan3" ) # Bonferroni
+  lines( Result.unknown[,1],Result.unknown[,3], pch=15, type="b", col="blue"  ) # ELJS
+  lines( Result.unknown[,1],Result.unknown[,4], pch=7 , type="b", col="purple") # TW
+  lines( Result.unknown[,1],Result.unknown[,5], pch=17, type="b", col="green4") # Smyth
+  lines( Result.unknown[,1],Result.unknown[,6], pch=16, type="b", col="gold4" ) # Vash
+  lines( Result.unknown[,1],Result.unknown[,7], pch=9 , type="b", col="brown" ) # fEBV
+  lines( Result.unknown[,1],Result.unknown[,8], pch=8 , type="b", col="orange") # fEBVS
+  lines( Result.unknown[,1],Result.unknown[,9], pch=10, type="b", col="green ") # ReBayes
+  lines( Result.unknown[,1],Result.unknown[,10], pch=19, type="b", col="red"  ) # FEBV
+
+  if(prior <=3 )
+    {
+      par(xpd=TRUE)
+      legend("topright",horiz=F, inset = c(-0.3,0.2), legend=c("sSq","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS", "REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),pch=c(3,15,7,17,16,9,8,10, 19), ncol=1, lty=1:1, cex=1)
+    }
+  dev.off()
+
+}
