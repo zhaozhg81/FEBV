@@ -16,5 +16,5 @@ n <- 6
 PLOT=FALSE
 
 
-F_mean_Comparison(G, numSim, N, n, prior, a, b, perc, bw='ucv', PLOT=FALSE)
+F_mean_Comparison(G, numSim, N, n, prior, a, b, perc, bw='ucv', PLOT)
 
