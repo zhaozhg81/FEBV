@@ -90,9 +90,9 @@
            
            temp       <- L %*% x + array(theta,c(G,n))
            xi         <- apply(temp,1,mean)
-           sSq        <- apply(temp,1,var)
+           sSq        <- apply(temp,1,var)/n
 
-           muhat      <- mean(xi) #sum((xi/sSq))/sum(1/sSq)
+           muhat      <- mean(xi)
            T.stat     <- xi/sqrt(sSq)
            max.ind    <- order(abs(T.stat),decreasing=TRUE)[1:1]
 
@@ -104,24 +104,23 @@
                bandwidth[3] <- h.ucv(sSq, deriv.order=2)$h                
              }
 
-           bon        <- sSq/n
-           sSq        <- sSq/n
-           ljs        <- LJS(sSq,df)/n
-           opt        <- OPT(sSq,df)/n
-           smy        <- SMY(sSq,df)/n
-           #vsh        <- VSH(sSq,df)/n
-           #feb        <- fEB(sSq,df,bandwidth)/n
-           #fes        <- fES(sSq,df,bandwidth)/n
-          ## reb        <- GVmix(sSq,array(df,G))$dy/n
-           Feb        <- FEB(sSq,df)/n
+           bon        <- sSq
+           ljs        <- LJS(sSq,df)
+           opt        <- OPT(sSq,df)
+           smy        <- SMY(sSq,df)
+           #vsh        <- VSH(sSq,df)
+           feb        <- fEB(sSq,df,bandwidth)
+           fes        <- fES(sSq,df,bandwidth)
+           #reb        <- GVmix(sSq,array(df,G))$dy
+           Feb        <- FEB(sSq,df)
            reb = Feb
-           vsh=Feb
-           feb=Feb
-           fes=Feb
+           vsh = Feb
+           #feb=Feb
+           #fes=Feb
            
-           tauSqhat[i]<- tauSqfn(sSq/n,xi,muhat,alpha)
+           tauSqhat[i]<- tauSqfn(sSq,xi,muhat,alpha)
 
-           tauSqhat.sSq[i]<- tauSqhat[i]
+          tauSqhat.sSq[i]<- tauSqhat[i]
           tauSqhat.ljs[i]<- tauSqhat[i]
           tauSqhat.opt[i]<- tauSqhat[i]
           tauSqhat.smy[i]<- tauSqhat[i]

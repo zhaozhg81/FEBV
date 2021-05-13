@@ -17,6 +17,7 @@ Yeil Kwon, Zhao, Z. (2019) On F-modelling based Empiricial Bayes Estimation of V
 The aucillary files are stored in the directory R/
 The source files for conducting the simulation studies are stored in the direcotry simulation/
 The source files for the realdata analysis are stored in the directory realdata/
+The source files for simulation via real data simulation_Data/
 
 (i) Comparison of variance estimations post the selection
 simulation/VarComp_[1-8].R
@@ -38,6 +39,13 @@ simulation/CI_Ind_[1-8].R
 
 (v) Concordance rate in the realdata analysis
 realdata/run_dataanalysis.R
+
+(vi) simulation via real data
+simulation_Data/Colon_n_5.R
+simulation_Data/Colon_n_10.R
+simulation_Data/Leukemia_n_5.R
+simulation_Data/Leukemia_n_10.R
+
 
 Warnings: when running the method REBayes, the function GVMix() might terminate and returns an error message.
 This error is generated due to the optimization. If this happens, please rerun the code again.

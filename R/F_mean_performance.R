@@ -85,7 +85,7 @@ F_mean_Comparison <- function(G, numSim, N, n, prior, a, b, perc=0.001, bw='ucv'
           sSq        <- sSq
           ljs        <- LJS(sSq,df)
           smy        <- SMY(sSq,df)
-        vsh        <- VSH(sSq,df)
+          vsh        <- VSH(sSq,df)
           opt        <- OPT(sSq,df)
           feb        <- fEB(sSq,df,bandwidth)
           fes        <- fES(sSq,df,bandwidth)
@@ -200,6 +200,7 @@ F_mean_Comparison <- function(G, numSim, N, n, prior, a, b, perc=0.001, bw='ucv'
   if(PLOT==TRUE)
     {
       ##-- Saving RData -------------------------------------------------------------------------------------------------------------------
+      df <- n-1
       
       path      <- paste("./Data/")
       settname  <- paste("MeanComp_prior_",prior,"_G_",G,"_df_",df,"_a_",a,"_b_",b,"_perc_",perc,sep="")
@@ -245,7 +246,7 @@ F_mean_Comparison <- function(G, numSim, N, n, prior, a, b, perc=0.001, bw='ucv'
   if(prior <= 2 )
     {
       par(xpd=TRUE)
-      legend("topright",horiz=F, inset = c(-0.3,0.2), legend=c("sSq","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS", "REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),pch=c(3,15,7,17,16,9,8,10, 19), ncol=1, lty=1:1, cex=1)
+      legend("topright",horiz=F, inset = c(-0.3,0.2), legend=c(TeX(r'($s^2$)'),"ELJS","TW","Smyth","Vash","f-EBV","f-EBVS", "REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),pch=c(3,15,7,17,16,9,8,10, 19), ncol=1, lty=1:1, cex=1)
     }
   dev.off()
 
