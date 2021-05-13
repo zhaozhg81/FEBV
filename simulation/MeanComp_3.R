@@ -13,8 +13,8 @@ N <- 40
 G <- 1000
 numSim <- 500
 n <- 6
-PLOT=TRUE
+PLOT=FALSE
 
 
-F_mean_Comparison(G, numSim, N, n, prior, a, b, perc, bw='ucv', PLOT=TRUE)
+F_mean_Comparison(G, numSim, N, n, prior, a, b, perc, bw='ucv', PLOT=FALSE)
 
