@@ -228,21 +228,11 @@ F_variance_Comparison <- function(G, numSim, n, prior, a, b, bw="ucv", PLOT=FALS
     path      <- paste("./Data/")
     path1     <- paste("./Figure/")
     
-    settname0  <- paste("VarComp_L0_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
-    filename   <- paste(path, settname0, ".Rdata", sep="")
-    save(L0, file = filename)
     
     settname1  <- paste("VarComp_L1_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
     filename   <- paste(path, settname1, ".Rdata", sep="")
     save(L1, file = filename)
     
-    settname2  <- paste("VarComp_L2_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
-    filename   <- paste(path, settname2, ".Rdata", sep="")
-    save(L2, file = filename)
-    
-    settnamep  <- paste("VarComp_Lp_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
-    filename   <- paste(path, settnamep, ".Rdata", sep="")
-    save(Lp, file = filename)
   }
   
   if( PLOT==TRUE)
@@ -250,21 +240,11 @@ F_variance_Comparison <- function(G, numSim, n, prior, a, b, bw="ucv", PLOT=FALS
       path      <- paste("./Data/")
       path1     <- paste("./Figure/")
       
-      settname0  <- paste("VarComp_L0_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
-      filename   <- paste(path, settname0, ".Rdata", sep="")
-      load(filename)
       
       settname1  <- paste("VarComp_L1_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
       filename   <- paste(path, settname1, ".Rdata", sep="")
       load(filename)
       
-      settname2  <- paste("VarComp_L2_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
-      filename   <- paste(path, settname2, ".Rdata", sep="")
-      load(filename)
-      
-      settnamep  <- paste("VarComp_Lp_prior_",prior,"_G_",G,"_a_",a,"_b_",b,sep="")
-      filename   <- paste(path, settnamep, ".Rdata", sep="")
-      load(filename)
     }
 
   ##-- Saving Figures -----------------------------------------------------------------------------------------------------------------
@@ -286,34 +266,12 @@ F_variance_Comparison <- function(G, numSim, n, prior, a, b, bw="ucv", PLOT=FALS
   par(mfrow=c(2,2))
   namelist=c("sSq",	"ELJS",	"TW",	"Smyth",	"Vash",	"fEBV",	"fEBVS", "REBayes",	"FEBV")
   
-  figurename1 <- paste(path1,"Risk_var_",settname0,"_max_five_percent.pdf",sep="")
-  pdf(figurename1,width=12,height=10)
-  par(mfrow=c(1,2))
-  barplot(log(L0[1,],10), ylab="log(MSE)", main=bquote(paste("[L0, Max]  ",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
-  barplot(log(L0[3,],10), ylab="log(MSE)", main=bquote(paste("[L0, 5%]  " ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
-  dev.off()
-  
   figurename1 <- paste(path1,"Risk_var_",settname1,"_max_five_percent.pdf",sep="")
   pdf(figurename1,width=12,height=10)
   par(mfrow=c(1,2))
   barplot(log(L1[1,],10), ylab="log(MSE)", main=bquote(paste("[L1, Max]  ",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
   barplot(log(L1[3,],10), ylab="log(MSE)", main=bquote(paste("[L1, 5%]  " ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
   dev.off()
-  
-  figurename1 <- paste(path1,"Risk_var_",settname2,"_max_five_percent.pdf",sep="")
-  pdf(figurename1,width=12,height=10)
-  par(mfrow=c(1,2))
-  barplot(log(L2[1,],10), ylab="log(MSE)", main=bquote(paste("[L2, Max]  ",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
-  barplot(log(L2[3,],10), ylab="log(MSE)", main=bquote(paste("[L2, 5%]  " ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
-  dev.off()
-  
-  figurename1 <- paste(path1,"Risk_var_",settnamep,"_max_five_percent.pdf",sep="")
-  pdf(figurename1,width=12,height=10)
-  par(mfrow=c(1,2))
-  barplot(log(Lp[1,],10), ylab="log(MSE)", main=bquote(paste("[L1p, Max]  ",.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
-  barplot(log(Lp[3,],10), ylab="log(MSE)", main=bquote(paste("[L1p, 5%]  " ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
-  dev.off()
-
   
 
 }
