@@ -38,3 +38,6 @@ simulation/CI_Ind_[1-8].R
 
 (v) Concordance rate in the realdata analysis
 realdata/run_dataanalysis.R
+
+Warnings: when running the method REBayes, the function GVMix() might terminate and returns an error message.
+This error is generated due to the optimization. If this happens, please rerun the code again.
