@@ -312,7 +312,6 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     PRIOR<-"Mix Lognormal"
   }
   
-  par(mfrow=c(2,2))
   namelist=c("sSq",	"ELJS",	"TW",	"Smyth",	"Vash",	"fEBV",	"fEBVS", "REBayes", "FEBV")
   
   
@@ -325,7 +324,6 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
   
                                         ##-- Showing Figures ----------------------------------------------------------------------------------------------------------------------------
   
-  par(mfrow=c(2,2))
   barplot(log(L1,10), ylab="MSE (log_scale)", main=bquote(paste("[L1, 1%]  " ,.(PRIOR), "    a=",.(a),",  b=",.(b))),name=namelist)
   
 
