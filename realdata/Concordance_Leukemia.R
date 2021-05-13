@@ -183,14 +183,9 @@ concordance_leukemia <- function(numSim=500, PLOT=FALSE, bw="defaults")
   boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4],Crate2[,5],Crate2[,6],Crate2[,7],Crate2[,8],Crate2[,9],main="Rate of discordant pairs : Leukemia data", ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
   dev.off()
   
-  path1     <-"/home/zhaozhg/Dropbox/Apps/Overleaf/On F-modelling based Empirical Bayes Estimation of Variances/figure/"
-  figurename1 <- paste(path1,"Leukemia_Concordance.pdf",sep="")
-  pdf(figurename1,width=12,height=5)
-  boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4],Crate2[,5],Crate2[,6],Crate2[,7],Crate2[,8],Crate2[,9],main="Rate of discordant pairs : Leukemia data", ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
-  dev.off()
   
-  
-  boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4],Crate2[,5],Crate2[,6],Crate2[,7],Crate2[,8],Crate2[,9],main="Rate of discordant pairs : Leukemia data", ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
+  boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4],Crate2[,5],Crate2[,6],Crate2[,7],
+          Crate2[,8],Crate2[,9],main="Rate of discordant decisions : Leukemia data", ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
   
   ##---------------------------------------------------------------------------------------------------------------------------------
 }

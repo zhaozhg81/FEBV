@@ -19,7 +19,7 @@ F_variance_Comparison <- function(G, numSim, n, prior, a, b, bw="ucv", PLOT=FALS
     mu      <- 0     # Mean of prior distrubution
     alpha   <- 0.05
     
-    percvec <- c(1/G, 0.01, 0.05, 1)
+    percvec <- c(1/G, 0.01, 0.05)
     N=length(percvec)
     
     GAM     <- 0

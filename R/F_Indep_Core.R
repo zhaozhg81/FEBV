@@ -323,47 +323,6 @@ CI_Ind <- function(G, numSim, N, n, prior, a, b, PLOT=FALSE, bw= 'ucv' )
   dev.off()
 
 
-  path1     <-"/home/zhaozhg/Dropbox/Apps/Overleaf/On F-modelling based Empirical Bayes Estimation of Variances/figure/"
-  
-  ## Coverage 
-  figurename1 <- paste(path1,"Coverage_",settname,".pdf",sep="")
-  pdf(figurename1,width=8,height=5)
-  par(mar=c(5,5,1,10) )
-  plot( XLAB,Result[1:30,2],  xlab=TeX(r'($\tau^2$ )'),ylab=TeX(r'(Coverage Prob. of $\theta_{(1)}$)'),  
-        ylim=c(0,1), xlim=c(0,max(XLAB)),col="white",main=bquote(paste(.(PRIOR), "    a=",.(a),",  b=",.(b),",  df=",.(df) )), cex.lab=1.2, cex.axis=1.2, cex.main=1.2)
-  lines( XLAB,rep(0.95-qnorm(0.975)*sqrt(0.05*0.95/500),30), type="l", col="black",lwd=3,lty=2)
-  lines( XLAB,Result[1:30,2] , pch=3 , type="b", col="cyan3" ) # Bonferroni
-  lines( XLAB,Result[1:30,10], pch=15, type="b", col="blue"  ) # ELJS
-  lines( XLAB,Result[1:30,14], pch=7 , type="b", col="purple") # TW
-  lines( XLAB,Result[1:30,18], pch=17, type="b", col="green4") # Smyth
-  lines( XLAB,Result[1:30,22], pch=16, type="b", col="gold4" ) # Vash
-  lines( XLAB,Result[1:30,26], pch=9 , type="b", col="brown" ) # fEBV
-  lines( XLAB,Result[1:30,30], pch=8 , type="b", col="orange") # fEBVS
-  lines( XLAB,Result[1:30,34], pch=10, type="b", col="green" ) # ReBayes
-  lines( XLAB,Result[1:30,38], pch=19, type="b", col="red"   ) # FEBV
-  ## lines( XLAB,Result[1:30,38], pch=10, type="b", col="green ") # SOC
-  par(xpd=TRUE)
-  legend("topright",horiz=F, inset = c(-0.3,0.2), legend=c("Error Bar","Bonferroni","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","REBayes","F-EBV"),col=c("black","cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),pch=c(NA,3,15,7,17,16,9,8,10,19), ncol=1, lty=1:1, cex=1)
-  dev.off()
-  
-  ## Length Ratio
-  figurename2 <- paste(path1,"LengRatio_",settname,".pdf",sep="")
-  pdf(figurename2,width=8,height=5)
-  par(mar=c(5,5,1,10) )
-  plot( XLAB,Result[1:30,3], xlab=TeX(r'($\tau^2$ )'), ylab="Length Ratio", ylim=c(0,1), xlim=c(0,max(XLAB)),col="white",main=bquote(paste(.(PRIOR), "    a=",.(a),",  b=",.(b),",  df=",.(df) )), cex.lab=1.2, cex.axis=1.2, cex.main=1.2)
-  lines( XLAB,Result[1:30,11]/Result[1:30,3], pch=15, type="b", col="blue"  ) # ELJS
-  lines( XLAB,Result[1:30,15]/Result[1:30,3], pch=7 , type="b", col="purple") # TW
-  lines( XLAB,Result[1:30,19]/Result[1:30,3], pch=17, type="b", col="green4") # Smyth
-  lines( XLAB,Result[1:30,23]/Result[1:30,3], pch=16, type="b", col="gold4" ) # Vash
-  lines( XLAB,Result[1:30,27]/Result[1:30,3], pch=9 , type="b", col="brown" ) # fEBV
-  lines( XLAB,Result[1:30,31]/Result[1:30,3], pch=8 , type="b", col="orange") # fEBVS
-  lines( XLAB,Result[1:30,35]/Result[1:30,3], pch=10, type="b", col="green" ) # ReBayes
-  lines( XLAB,Result[1:30,39]/Result[1:30,3], pch=19, type="b", col="red"   ) # FEBV
-  ##  lines( XLAB,Result[1:30,39]/Result[1:30,3], pch=10, type="b", col="green ") # SOC
-  ## legend("topright",horiz=F, inset = c(-0.3,0), legend=c("ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","F-EBV","SOC"),col=c("blue","purple","green4","gold4", "brown","orange","red","green"),pch=c(15,7,17,16,9,8,19,10), ncol=1, lty=1:1, cex=1)
-  dev.off()
-
-  
   #-- Showing Figures ----------------------------------------------------------------------------------------------------------------------------
   
   # Coverage 

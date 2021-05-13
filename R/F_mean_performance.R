@@ -249,30 +249,6 @@ F_mean_Comparison <- function(G, numSim, N, n, prior, a, b, perc=0.001, bw='ucv'
     }
   dev.off()
 
-  path1     <-"/home/zhaozhg/Dropbox/Apps/Overleaf/On F-modelling based Empirical Bayes Estimation of Variances/figure/"
-  
-  ## Comparison of Estimators for theta
-  figurename1 <- paste(path1,"MSE_mean_comp_",settname,".pdf",sep="")
-  pdf(figurename1,width=8,height=5)
-  par(mar=c(5,6,1,10) )
-  plot( XLAB,Result[1:30,2],xlab=TeX(r'($\tau^2$ )'),ylab=TeX(r'(MSE of $\theta_{(1)}$ )'), ylim=c(0,max(Result[1:30,2])), xlim=c(0,max(XLAB)),col="white",main=bquote(paste(.(PRIOR), "    a=",.(a),",  b=",.(b),",  df=",.(df) )), cex.lab=1.2, cex.axis=1.2, cex.main=1.2)
-  lines( XLAB,Result[1:30,2], pch=3 , type="b", col="cyan3" ) # Bonferroni
-  lines( XLAB,Result[1:30,3], pch=15, type="b", col="blue"  ) # ELJS
-  lines( XLAB,Result[1:30,4], pch=7 , type="b", col="purple") # TW
-  lines( XLAB,Result[1:30,5], pch=17, type="b", col="green4") # Smyth
-  lines( XLAB,Result[1:30,6], pch=16, type="b", col="gold4" ) # Vash
-  lines( XLAB,Result[1:30,7], pch=9 , type="b", col="brown" ) # fEBV
-  lines( XLAB,Result[1:30,8], pch=8 , type="b", col="orange") # fEBVS
-  lines( XLAB,Result[1:30,9], pch=10, type="b", col="green ") # ReBayes
-  lines( XLAB,Result[1:30,10], pch=19, type="b", col="red"  ) # FEBV
-
-  if(prior <= 2)
-    {
-      par(xpd=TRUE)
-      legend("topright",horiz=F, inset = c(-0.3,0.2), legend=c("sSq","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS", "REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),pch=c(3,15,7,17,16,9,8,10, 19), ncol=1, lty=1:1, cex=1)
-    }
-  dev.off()  
-
     
   ##-- Showing Figures ----------------------------------------------------------------------------------------------------------------------------
   par(mar=c(5,6,1,10) )

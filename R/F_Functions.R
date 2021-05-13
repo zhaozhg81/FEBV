@@ -9,6 +9,8 @@ library(matrixcalc)
 library(kedd)
 library(numDeriv)
 library(Matrix)
+library(REBayes)
+source("../R/F_EBV.R")
 
 #-- begin : functions ----------------------------------------------------------------------------------------------------------------------------------------------
 
