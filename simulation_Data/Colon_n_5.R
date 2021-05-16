@@ -5,7 +5,7 @@
      N       <- 40     # Number of ticks for X-axis
      n       <- 5     # sample size
 
-plot=TRUE
+PLOT=TRUE
 source("Colon_Core.R")
 
      

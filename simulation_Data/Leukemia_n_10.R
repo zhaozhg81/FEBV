@@ -5,7 +5,7 @@
      N       <- 40     # Number of ticks for X-axis
      n       <- 10     # sample size
 
-plot = TRUE
+PLOT = TRUE
 source("Leukemia_Core.R")
 
      
