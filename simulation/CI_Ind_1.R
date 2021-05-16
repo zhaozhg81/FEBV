@@ -15,4 +15,6 @@ numSim  <- 500    # The number of simulation
 N       <- 40     # The Number of ticks for X-axis
 n       <- 6      # Sample size  (df=n-1)
 
-CI_Ind(G, numSim, N, n, prior, a, b, PLOT=FALSE, bw= 'ucv' )
+CI_Ind(G, numSim, N, n, prior, a, b, PLOT=TRUE, bw= 'ucv' )
+  
+  

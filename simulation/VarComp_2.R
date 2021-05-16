@@ -6,7 +6,7 @@ n <- 6
 a <- 6
 b <- 1
 prior <- 1
-PLOT=FALSE
+PLOT=TRUE
 bw='ucv'
 
 F_variance_Comparison(G, numSim, n, prior, a, b, bw, PLOT)
