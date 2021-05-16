@@ -213,7 +213,7 @@ CI_Ind <- function(G, numSim, N, n, prior, a, b, PLOT=FALSE, bw= 'ucv' )
     
       
       ##-- Saving RData -------------------------------------------------------------------------------------------------------------------
-      
+      df = n-1
       path      <- paste("./Data/")
       path1     <- paste("./Figure/")
       settname  <- paste("Indep_prior_",prior,"_df_",df,"_a_",a,"_b_",b,sep="")
@@ -223,6 +223,8 @@ CI_Ind <- function(G, numSim, N, n, prior, a, b, PLOT=FALSE, bw= 'ucv' )
   
   if(PLOT==TRUE)
     {
+    
+    df = n-1
       path      <- paste("./Data/")
       path1     <- paste("./Figure/")
       settname  <- paste("Indep_prior_",prior,"_df_",df,"_a_",a,"_b_",b,sep="")
