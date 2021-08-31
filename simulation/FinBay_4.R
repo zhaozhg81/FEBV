@@ -6,7 +6,7 @@ n <- 6
 a <- -2
 b <- 1
 prior <- 2
-PLOT=FALSE
+PLOT=TRUE
 
 F_FinBayes(G, numSim, n, prior, a, b, PLOT)
 

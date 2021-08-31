@@ -52,7 +52,7 @@ CVF <-function(cvid, X_train_tumor, X_train_normal, X_valid_tumor, X_valid_norma
   
   ljs   <- LJS(sSq,df)
   opt   <- OPT(sSq,df)
-  smy   <- SMY(sSq,df)
+  smy   <- modified.SMY(sSq,df)
   vsh   <- VSH(sSq,df)
   feb   <- fEB(sSq,df, bandwidth)
   fes   <- fES(sSq,df, bandwidth)
