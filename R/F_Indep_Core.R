@@ -115,7 +115,7 @@ CI_Ind <- function(G, numSim, N, n, prior, a, b, PLOT=FALSE, bw= 'ucv' )
         
         ljs        <- LJS(sSq,df)
         opt        <- OPT(sSq,df)
-        smy        <- SMY(sSq,df)
+        smy        <- modified.SMY(sSq,df)
         vsh        <- VSH(sSq,df)
         feb        <- fEB(sSq,df,bandwidth)
         fes        <- fES(sSq,df,bandwidth)

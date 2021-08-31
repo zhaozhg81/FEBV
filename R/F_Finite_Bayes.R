@@ -36,6 +36,7 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     ljs     <- array(0, G)
     opt     <- array(0, G)
     smy     <- array(0, G)
+    modified.smy     <- array(0, G)
     vsh     <- array(0, G)
     feb     <- array(0, G)
     fes     <- array(0, G)
@@ -46,6 +47,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     ljs0     <- array(0, numSim)
     opt0     <- array(0, numSim)
     smy0     <- array(0, numSim)
+    modified.smy0     <- array(0, numSim)
+    
     vsh0     <- array(0, numSim)
     feb0     <- array(0, numSim)
     fes0     <- array(0, numSim)
@@ -61,6 +64,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     tsse1.ljs <- tsse1.sSq
     tsse1.opt <- tsse1.sSq
     tsse1.smy <- tsse1.sSq
+    tsse1.modified.smy <- tsse1.sSq
+    
     tsse1.vsh <- tsse1.sSq
     tsse1.feb <- tsse1.sSq
     tsse1.fes <- tsse1.sSq
@@ -71,7 +76,9 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     tsse2.ljs <- tsse2.sSq
     tsse2.opt <- tsse2.sSq
     tsse2.smy <- tsse2.sSq
-    tsse2.vsh <- tsse2.sSq
+    tsse2.modified.smy <- tsse2.sSq
+
+        tsse2.vsh <- tsse2.sSq
     tsse2.feb <- tsse2.sSq
     tsse2.fes <- tsse2.sSq
     tsse2.Feb <- tsse2.sSq
@@ -82,6 +89,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     tsse0.ljs <- tsse0.sSq
     tsse0.opt <- tsse0.sSq
     tsse0.smy <- tsse0.sSq
+    tsse0.modified.smy <- tsse0.sSq
+    
     tsse0.vsh <- tsse0.sSq
     tsse0.feb <- tsse0.sSq
     tsse0.fes <- tsse0.sSq
@@ -92,6 +101,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     tssep.ljs <- tssep.sSq
     tssep.opt <- tssep.sSq
     tssep.smy <- tssep.sSq
+    tssep.modified.smy <- tssep.sSq
+    
     tssep.vsh <- tssep.sSq
     tssep.feb <- tssep.sSq
     tssep.fes <- tssep.sSq
@@ -127,6 +138,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
         sSq        <- sSq
         ljs        <- LJS(sSq,df)
         smy        <- SMY(sSq,df)
+        modified.smy        <- modified.SMY(sSq,df)
+        
         vsh        <- VSH(sSq,df)
         opt        <- OPT(sSq,df)
         feb        <- fEB(sSq,df,bandwidth)
@@ -166,6 +179,17 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
         ljs0[i]  <- B0*(sSq0[i]^(1-a00))*(sSq0[i]^a00)
         opt0[i]  <- ((hf(df,1,G)*nsSqpool0)^nahat0)*(hf(df,1,1)*opt0_temp^(1-nahat0))
         smy0[i]  <- (d0*s0+df*sSq0[i])/(d0+df)
+        
+        
+        ## Modified Smyth method
+        res    <-squeezeVar(sSq, df)
+        a0 = res$df.prior/2 # prior parameters
+        b0 = (res$df.prior/2)*res$var.prior
+        a1 = a0 + df/2
+        b1 = b0 + df*sSq0[i]/2
+        modified.smy0[i] <- b1/(a1-2) # instead of usual estimate, b1/a1, which is inverse of posterior mean of precision
+        
+        
         vsh0[i]  <- VSH(sSq_ext,df)[(G+1)]
         feb0[i]  <- ifelse(((df-2)/(df*sSq0[i])-2/df*(f10[i]/max(f00[i],0.00001)))^{-1}<0,sSq0[i],((df-2)/(df*sSq0[i])-2/df*(f10[i]/max(f00[i],0.00001)))^{-1})
         Feb0[i]  <- FEB(sSq_ext,df)[(G+1)]
@@ -193,6 +217,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
         tsse0.ljs[i] <-(mean((ljs0[i]-sigmaSq0)^2,na.rm=T))  
         tsse0.opt[i] <-(mean((opt0[i]-sigmaSq0)^2,na.rm=T))  
         tsse0.smy[i] <-(mean((smy0[i]-sigmaSq0)^2,na.rm=T))  
+        tsse0.modified.smy[i] <-(mean((modified.smy0[i]-sigmaSq0)^2,na.rm=T))  
+        
         tsse0.vsh[i] <-(mean((vsh0[i]-sigmaSq0)^2,na.rm=T))  
         tsse0.feb[i] <-(mean((feb0[i]-sigmaSq0)^2,na.rm=T))  
         tsse0.fes[i] <-(mean((fes0[i]-sigmaSq0)^2,na.rm=T))  
@@ -205,6 +231,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
         tssep.ljs[i] <-(mean((ljs0[i]/sigmaSq0-1)^2,na.rm=T))
         tssep.opt[i] <-(mean((opt0[i]/sigmaSq0-1)^2,na.rm=T))
         tssep.smy[i] <-(mean((smy0[i]/sigmaSq0-1)^2,na.rm=T))
+        tssep.modified.smy[i] <-(mean((modified.smy0[i]/sigmaSq0-1)^2,na.rm=T))
+        
         tssep.vsh[i] <-(mean((vsh0[i]/sigmaSq0-1)^2,na.rm=T))
         tssep.feb[i] <-(mean((feb0[i]/sigmaSq0-1)^2,na.rm=T))
         tssep.fes[i] <-(mean((fes0[i]/sigmaSq0-1)^2,na.rm=T))
@@ -216,6 +244,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
         tsse1.ljs[i] <-(mean((sigmaSq0/ljs0[i]-1)^2,na.rm=T))
         tsse1.opt[i] <-(mean((sigmaSq0/opt0[i]-1)^2,na.rm=T))
         tsse1.smy[i] <-(mean((sigmaSq0/smy0[i]-1)^2,na.rm=T))
+        tsse1.modified.smy[i] <-(mean((sigmaSq0/modified.smy0[i]-1)^2,na.rm=T))
+        
         tsse1.vsh[i] <-(mean((sigmaSq0/vsh0[i]-1)^2,na.rm=T))
         tsse1.feb[i] <-(mean((sigmaSq0/feb0[i]-1)^2,na.rm=T))
         tsse1.fes[i] <-(mean((sigmaSq0/fes0[i]-1)^2,na.rm=T))
@@ -227,6 +257,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
         tsse2.ljs[i] <-(mean((ljs0[i]/sigmaSq0-log(ljs0[i]/sigmaSq0)-1),na.rm=T))
         tsse2.opt[i] <-(mean((opt0[i]/sigmaSq0-log(opt0[i]/sigmaSq0)-1),na.rm=T))
         tsse2.smy[i] <-(mean((smy0[i]/sigmaSq0-log(smy0[i]/sigmaSq0)-1),na.rm=T))
+        tsse2.modified.smy[i] <-(mean((modified.smy0[i]/sigmaSq0-log(modified.smy0[i]/sigmaSq0)-1),na.rm=T))
+        
         tsse2.vsh[i] <-(mean((vsh0[i]/sigmaSq0-log(vsh0[i]/sigmaSq0)-1),na.rm=T))
         tsse2.feb[i] <-(mean((feb0[i]/sigmaSq0-log(feb0[i]/sigmaSq0)-1),na.rm=T))
         tsse2.fes[i] <-(mean((fes0[i]/sigmaSq0-log(fes0[i]/sigmaSq0)-1),na.rm=T))
@@ -239,6 +271,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     tmse0.ljs<-mean(tsse0.ljs);  tmse1.ljs<-mean(tsse1.ljs); tmse2.ljs<-mean(tsse2.ljs);  tmsep.ljs<-mean(tssep.ljs); 
     tmse0.opt<-mean(tsse0.opt);  tmse1.opt<-mean(tsse1.opt); tmse2.opt<-mean(tsse2.opt);  tmsep.opt<-mean(tssep.opt); 
     tmse0.smy<-mean(tsse0.smy);  tmse1.smy<-mean(tsse1.smy); tmse2.smy<-mean(tsse2.smy);  tmsep.smy<-mean(tssep.smy); 
+    tmse0.modified.smy<-mean(tsse0.modified.smy);  tmse1.modified.smy<-mean(tsse1.modified.smy); tmse2.modified.smy<-mean(tsse2.modified.smy);  tmsep.modified.smy<-mean(tssep.modified.smy); 
+    
     tmse0.vsh<-mean(tsse0.vsh);  tmse1.vsh<-mean(tsse1.vsh); tmse2.vsh<-mean(tsse2.vsh);  tmsep.vsh<-mean(tssep.vsh); 
     tmse0.feb<-mean(tsse0.feb);  tmse1.feb<-mean(tsse1.feb); tmse2.feb<-mean(tsse2.feb);  tmsep.feb<-mean(tssep.feb); 
     tmse0.fes<-mean(tsse0.fes);  tmse1.fes<-mean(tsse1.fes); tmse2.fes<-mean(tsse2.fes);  tmsep.fes<-mean(tssep.fes); 
@@ -250,6 +284,8 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     tmsd0.ljs<-sd(tsse0.ljs);  tmsd1.ljs<-sd(tsse1.ljs); tmsd2.ljs<-sd(tsse2.ljs);  tmsdp.ljs<-sd(tssep.ljs); 
     tmsd0.opt<-sd(tsse0.opt);  tmsd1.opt<-sd(tsse1.opt); tmsd2.opt<-sd(tsse2.opt);  tmsdp.opt<-sd(tssep.opt); 
     tmsd0.smy<-sd(tsse0.smy);  tmsd1.smy<-sd(tsse1.smy); tmsd2.smy<-sd(tsse2.smy);  tmsdp.smy<-sd(tssep.smy); 
+    tmsd0.modified.smy<-sd(tsse0.modified.smy);  tmsd1.modified.smy<-sd(tsse1.modified.smy); tmsd2.modified.smy<-sd(tsse2.modified.smy);  tmsdp.modified.smy<-sd(tssep.modified.smy); 
+    
     tmsd0.vsh<-sd(tsse0.vsh);  tmsd1.vsh<-sd(tsse1.vsh); tmsd2.vsh<-sd(tsse2.vsh);  tmsdp.vsh<-sd(tssep.vsh); 
     tmsd0.feb<-sd(tsse0.feb);  tmsd1.feb<-sd(tsse1.feb); tmsd2.feb<-sd(tsse2.feb);  tmsdp.feb<-sd(tssep.feb); 
     tmsd0.fes<-sd(tsse0.fes);  tmsd1.fes<-sd(tsse1.fes); tmsd2.fes<-sd(tsse2.fes);  tmsdp.fes<-sd(tssep.fes); 
@@ -258,15 +294,15 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     
     
     
-    L0  <-round(c(tmse0.sSq, tmse0.ljs, tmse0.opt, tmse0.smy, tmse0.vsh, tmse0.feb, tmse0.fes, tmse0.rebayes, tmse0.Feb),3)
-    L1  <-round(c(tmse1.sSq, tmse1.ljs, tmse1.opt, tmse1.smy, tmse1.vsh, tmse1.feb, tmse1.fes, tmse1.rebayes, tmse1.Feb),3)
-    L2  <-round(c(tmse2.sSq, tmse2.ljs, tmse2.opt, tmse2.smy, tmse2.vsh, tmse2.feb, tmse2.fes, tmse2.rebayes, tmse2.Feb),3)
-    Lp  <-round(c(tmsep.sSq, tmsep.ljs, tmsep.opt, tmsep.smy, tmsep.vsh, tmsep.feb, tmsep.fes, tmsep.rebayes, tmsep.Feb),3)
+    L0  <-round(c(tmse0.sSq, tmse0.ljs, tmse0.opt, tmse0.smy, tmse0.modified.smy, tmse0.vsh, tmse0.feb, tmse0.fes, tmse0.rebayes, tmse0.Feb),3)
+    L1  <-round(c(tmse1.sSq, tmse1.ljs, tmse1.opt, tmse1.smy, tmse1.modified.smy, tmse1.vsh, tmse1.feb, tmse1.fes, tmse1.rebayes, tmse1.Feb),3)
+    L2  <-round(c(tmse2.sSq, tmse2.ljs, tmse2.opt, tmse2.smy, tmse2.modified.smy, tmse2.vsh, tmse2.feb, tmse2.fes, tmse2.rebayes, tmse2.Feb),3)
+    Lp  <-round(c(tmsep.sSq, tmsep.ljs, tmsep.opt, tmsep.smy, tmsep.modified.smy, tmsep.vsh, tmsep.feb, tmsep.fes, tmsep.rebayes, tmsep.Feb),3)
     
-    Lsd0<-round(c(tmsd0.sSq, tmsd0.ljs, tmsd0.opt, tmsd0.smy, tmsd0.vsh, tmsd0.feb,  tmse0.fes, tmsd0.rebayes, tmsd0.Feb),3)
-    Lsd1<-round(c(tmsd1.sSq, tmsd1.ljs, tmsd1.opt, tmsd1.smy, tmsd1.vsh, tmsd1.feb,  tmsd1.fes, tmsd1.rebayes, tmsd1.Feb),3)
-    Lsd2<-round(c(tmsd2.sSq, tmsd2.ljs, tmsd2.opt, tmsd2.smy, tmsd2.vsh, tmsd2.feb,  tmsd2.fes, tmsd2.rebayes, tmsd2.Feb),3)
-    Lsdp<-round(c(tmsdp.sSq, tmsdp.ljs, tmsdp.opt, tmsdp.smy, tmsdp.vsh, tmsdp.feb,  tmsdp.fes, tmsdp.rebayes, tmsdp.Feb),3)
+    Lsd0<-round(c(tmsd0.sSq, tmsd0.ljs, tmsd0.opt, tmsd0.smy, tmsd0.modified.smy, tmsd0.vsh, tmsd0.feb,  tmse0.fes, tmsd0.rebayes, tmsd0.Feb),3)
+    Lsd1<-round(c(tmsd1.sSq, tmsd1.ljs, tmsd1.opt, tmsd1.smy, tmsd1.modified.smy, tmsd1.vsh, tmsd1.feb,  tmsd1.fes, tmsd1.rebayes, tmsd1.Feb),3)
+    Lsd2<-round(c(tmsd2.sSq, tmsd2.ljs, tmsd2.opt, tmsd2.smy, tmsd2.modified.smy, tmsd2.vsh, tmsd2.feb,  tmsd2.fes, tmsd2.rebayes, tmsd2.Feb),3)
+    Lsdp<-round(c(tmsdp.sSq, tmsdp.ljs, tmsdp.opt, tmsdp.smy, tmsdp.modified.smy, tmsdp.vsh, tmsdp.feb,  tmsdp.fes, tmsdp.rebayes, tmsdp.Feb),3)
     
     L   <- rbind(L0, L1, L2, Lp)
     Lsd <- rbind(Lsd0, Lsd1, Lsd2, Lsdp)
@@ -312,7 +348,7 @@ F_FinBayes<- function(G, numSim, n, prior, a, b, PLOT=FALSE, bw='ucv')
     PRIOR<-"Mix Lognormal"
   }
   
-  namelist=c("sSq",	"ELJS",	"TW",	"Smyth",	"Vash",	"fEBV",	"fEBVS", "REBayes", "FEBV")
+  namelist=c("sSq",	"ELJS",	"TW",	"Smyth", "Modified Smyth",	"Vash",	"fEBV",	"fEBVS", "REBayes", "FEBV")
   
   
   figurename1 <- paste(path1,"FinBay_",settname,"_L1.pdf",sep="")

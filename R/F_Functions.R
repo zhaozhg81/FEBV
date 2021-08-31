@@ -162,6 +162,19 @@ SMY    <- function(sSq,df){
   smy
 }
 
+modified.SMY    <- function(sSq,df){
+  #smy    <-squeezeVar(sSq, df)$var.post
+  #smy
+  
+  res    <-squeezeVar(sSq, df)
+  a0 = res$df.prior/2 # prior parameters
+  b0 = (res$df.prior/2)*res$var.prior
+  a1 = a0 + df/2
+  b1 = b0 + df*sSq/2
+  smy <- b1/(a1-2) # instead of usual estimate, b1/a1, which is inverse of posterior mean of precision
+  smy
+}
+
 VSH  <- function(sSq, df){      
   vsh <- (vash(sqrt(sSq),df)$sd.post)^2
   vsh

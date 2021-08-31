@@ -84,7 +84,7 @@ F_mean_Comparison <- function(G, numSim, N, n, prior, a, b, perc=0.001, bw='ucv'
           bon        <- sSq
           sSq        <- sSq
           ljs        <- LJS(sSq,df)
-          smy        <- SMY(sSq,df)
+          smy        <- modified.SMY(sSq,df)
           vsh        <- VSH(sSq,df)
           opt        <- OPT(sSq,df)
           feb        <- fEB(sSq,df,bandwidth)
