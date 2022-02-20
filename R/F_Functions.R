@@ -10,6 +10,7 @@ library(kedd)
 library(numDeriv)
 library(Matrix)
 library(REBayes)
+library(statmod)
 source("../R/F_EBV.R")
 
 #-- begin : functions ----------------------------------------------------------------------------------------------------------------------------------------------
@@ -25,7 +26,14 @@ GenerateVar <- function(G, prior, a, b)
     sigmaSq <- (temp<0.2)*rlnorm(G,a,b)+(temp>0.2)*(temp<0.6)*rlnorm(G,0,sqrt(2*log(2))) + (temp>0.6)*rlnorm(G, 0, sqrt(4*log(2)))
   if(prior==3)
     sigmaSq <- (temp<0.2)*1/rgamma(G,a,b)+(temp>0.2)*(temp<0.6)*1/rgamma(G,8,6) + (temp>0.6)*1/rgamma(G,9,19)
-  
+  if(prior==5)
+    sigmaSq <- rinvgauss(G, 1/a, 1)
+  if(prior==6)
+    sigmaSq <- (temp<0.4) * rinvgauss(G, 1/a, 1) + (temp>0.4) * rinvgauss(G, a, a^4)
+  if(prior==7)
+    sigmaSq <- (temp<0.4) * rep(1/a, G) + (temp>0.4) * rep(a, G)
+
+    
   sigmaSq
 }
 
@@ -179,6 +187,20 @@ VSH  <- function(sSq, df){
   vsh <- (vash(sqrt(sSq),df)$sd.post)^2
   vsh
 }  
+
+modified.VSH <- function(sSq, df){
+  G <- length(sSq)
+  vsh <- vash( sqrt(sSq),df )
+  a0 = vsh$fitted.g$alpha
+  b0 = vsh$fitted.g$beta
+  pi0 = matrix( rep( vsh$fitted.g$pi, G), c(length(a0), G) )
+  
+  a1 = matrix( rep( a0 + df/2, G), c(length(a0), G) )
+  b1 = matrix( rep(b0,G), c(length(b0), G ) ) + df* t(matrix( rep(sSq,length(b0)), c(G,length(b0) ) ))/2
+
+  vsh <- apply( pi0 * b1/(a1-2), 2, sum )
+  vsh
+}
 
 
 ## Estimator for tauSq

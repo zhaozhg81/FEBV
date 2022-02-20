@@ -44,8 +44,10 @@ CVF <-function(cvid, X_train_AML, X_train_ALL, X_valid_AML, X_valid_ALL, bw="ucv
   
   ljs   <- LJS(sSq,df)
   opt   <- OPT(sSq,df)
-  smy   <- modified.SMY(sSq,df)
+  smy   <- SMY(sSq,df)
+  modified.smy   <- modified.SMY(sSq,df)
   vsh   <- VSH(sSq,df)
+  modified.vsh   <- modified.VSH(sSq,df)
   feb   <- fEB(sSq,df, bandwidth)
   fes   <- fES(sSq,df, bandwidth)
   reb   <- GVmix(sSq,array(df,G))$dy
@@ -58,14 +60,16 @@ CVF <-function(cvid, X_train_AML, X_train_ALL, X_valid_AML, X_valid_ALL, bw="ucv
   CI.ljs        <- CI.est(ljs,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   CI.opt        <- CI.est(opt,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   CI.smy        <- CI.est(smy,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
+  CI.modified.smy        <- CI.est(modified.smy,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   CI.vsh        <- CI.est(vsh,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
+  CI.modified.vsh        <- CI.est(modified.vsh,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   CI.feb        <- CI.est(feb,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   CI.fes        <- CI.est(fes,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   CI.reb        <- CI.est(reb,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   CI.Feb        <- CI.est(Feb,tauSq.sSq,d,theta,sigmaSq,muhat,alpha)
   
   
-  idvec=cbind(CI.sSq[,7],CI.ljs[,7],CI.opt[,7],CI.smy[,7],CI.vsh[,7],CI.feb[,7],CI.fes[,7],CI.reb[,7],CI.Feb[,7])
+  idvec=cbind(CI.sSq[,7],CI.ljs[,7],CI.opt[,7],CI.smy[,7],CI.modified.smy[,7],CI.vsh[,7],CI.modified.vsh[,7],CI.feb[,7],CI.fes[,7],CI.reb[,7],CI.Feb[,7])
   idvec
 }
 
@@ -94,7 +98,7 @@ concordance_leukemia <- function(numSim=500, PLOT=FALSE, bw="defaults")
       ## Simulation
       ##--------------------------------------------------------------------------------------------------------------------------
       
-      Crate2 <- array(0, c(numSim,9))
+      Crate2 <- array(0, c(numSim,11))
       
       for(i in 1:numSim)
         {
@@ -124,35 +128,41 @@ concordance_leukemia <- function(numSim=500, PLOT=FALSE, bw="defaults")
           ljs1=idvec1[,2]
           opt1=idvec1[,3]
           smy1=idvec1[,4]
-          vsh1=idvec1[,5]
-          feb1=idvec1[,6]
-          fes1=idvec1[,7]
-          reb1=idvec1[,8]
-          Feb1=idvec1[,9]
+          modified.smy1=idvec1[,5]
+          vsh1=idvec1[,6]
+          modified.vsh1=idvec1[,7]
+          feb1=idvec1[,8]
+          fes1=idvec1[,9]
+          reb1=idvec1[,10]
+          Feb1=idvec1[,11]
           
           idvec2=CVF(2, X_train_AML, X_train_ALL, X_valid_AML, X_valid_ALL, bw)
           sSq2=idvec2[,1]
           ljs2=idvec2[,2]
           opt2=idvec2[,3]
           smy2=idvec2[,4]
-          vsh2=idvec2[,5]
-          feb2=idvec2[,6]
-          fes2=idvec2[,7]
-          reb2=idvec2[,8]
-          Feb2=idvec2[,9]
+          modified.smy2=idvec2[,5]
+          vsh2=idvec2[,6]
+          modified.vsh2=idvec2[,7]
+          feb2=idvec2[,8]
+          fes2=idvec2[,9]
+          reb2=idvec2[,10]
+          Feb2=idvec2[,11]
           
           
           idsSq=ifelse((sSq1+sSq2)==1,1,0)
           idljs=ifelse((ljs1+ljs2)==1,1,0)
           idopt=ifelse((opt1+opt2)==1,1,0)
           idsmy=ifelse((smy1+smy2)==1,1,0)
+          modified.idsmy=ifelse((modified.smy1+modified.smy2)==1,1,0)
           idvsh=ifelse((vsh1+vsh2)==1,1,0)
+          modified.idvsh=ifelse((modified.vsh1+modified.vsh2)==1,1,0)
           idfeb=ifelse((feb1+feb2)==1,1,0)
           idfes=ifelse((fes1+fes2)==1,1,0)
           idreb=ifelse((reb1+reb2)==1,1,0)
           idFeb=ifelse((Feb1+Feb2)==1,1,0)
           
-          Crate2[i,]=c(mean(idsSq),mean(idljs),mean(idopt),mean(idsmy),mean(idvsh),mean(idfeb),mean(idfes),mean(idreb),mean(idFeb))
+          Crate2[i,]=c(mean(idsSq),mean(idljs),mean(idopt),mean(idsmy),mean(modified.idsmy),mean(idvsh),mean(modified.idvsh),mean(idfeb),mean(idfes),mean(idreb),mean(idFeb) )
         }
       
       ## Results
@@ -180,12 +190,15 @@ concordance_leukemia <- function(numSim=500, PLOT=FALSE, bw="defaults")
   
   figurename1 <- paste(path1,"Leukemia_Concordance.pdf",sep="")
   pdf(figurename1,width=12,height=5)
-  boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4],Crate2[,5],Crate2[,6],Crate2[,7],Crate2[,8],Crate2[,9],main="Rate of discordant pairs : Leukemia data", ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
+  boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4], Crate2[,5], Crate2[,6], Crate2[,7],
+          Crate2[,10],Crate2[,11],main="Colon Cancer data", 
+          ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","mSmyth", "Vash","mVash","REBayes","Proposed"),col=c("cyan3","blue","purple","green4","gold4","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
   dev.off()
-  
-  
-  boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4],Crate2[,5],Crate2[,6],Crate2[,7],
-          Crate2[,8],Crate2[,9],main="Rate of discordant decisions : Leukemia data", ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","Vash","f-EBV","f-EBVS","REBayes","F-EBV"),col=c("cyan3","blue","purple","green4","gold4", "brown","orange","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
+
+    boxplot(Crate2[,1],Crate2[,2],Crate2[,3],Crate2[,4], Crate2[,5], Crate2[,6], Crate2[,7],
+          Crate2[,10],Crate2[,11],main="Colon Cancer data", 
+          ylim=c(0.05,0.4), names=c("S^2","ELJS","TW","Smyth","mSmyth", "Vash","mVash","REBayes","Proposed"),col=c("cyan3","blue","purple","green4","gold4","green","red"),cex.lab=1.2,cex.axis=1.2,cex.main=1.5)
+
   
   ##---------------------------------------------------------------------------------------------------------------------------------
 }

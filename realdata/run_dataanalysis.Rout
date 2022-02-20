@@ -1,0 +1,48 @@
+
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> source("../realdata/Concordance_Colon.R")
+> source("../realdata/Concordance_Leukemia.R")
+> source("../realdata/Prostate.R")
+Loading required package: entropy
+Loading required package: corpcor
+
+Attaching package: ‘corpcor’
+
+The following object is masked from ‘package:matrixcalc’:
+
+    is.positive.definite
+
+Loading required package: fdrtool
+> 
+> ## concordance_colon(PLOT=TRUE)
+> ## concordance_leukemia(PLOT=TRUE)
+> 
+> ## To rerun the code, do the following
+> concordance_colon(numSim=500, PLOT=TRUE, bw='defaults')
+> concordance_leukemia(numSim=500, PLOT=TRUE, bw='defaults')
+> 
+> 
+> ## concordance_prostate(numSim=500, PLOT=FALSE, bw='defaults')
+> 
+> proc.time()
+   user  system elapsed 
+  3.490   0.093   3.574 

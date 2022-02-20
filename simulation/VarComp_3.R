@@ -3,10 +3,10 @@ source("../R/F_variance_performance.R")
 G <- 1000
 numSim <- 500
 n <- 6
-a <- -1
-b <- 0.472
+a <- -1.5
+b <- 1
 prior <- 2
-PLOT=TRUE
+PLOT=FALSE
 bw='ucv'
 
 F_variance_Comparison(G, numSim, n, prior, a, b, bw, PLOT)

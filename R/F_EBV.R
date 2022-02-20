@@ -1,6 +1,6 @@
 
 # F-EBV Estimator
-FEB       <- function(sSq,df){
+FEB       <- function(sSq,df, K=10){
   p        <- length(sSq)
   ORD      <- order(sSq)
   sSq.sort <- sSq[ORD]
@@ -19,9 +19,8 @@ FEB       <- function(sSq,df){
   rvec             <- rvec_num/rvec_den
   temp             <- df/2*(sSqlag*rvec-sSq.sort)
   temp[p]          <- NaN
-  temp[(p):p]      <- temp[(p-1):(p-1)]
+  temp[(p-K+1):p]      <- sSq.sort[ (p-K+1):p ]
   sigmaSq.hat      <- temp
   sigmaSq.hat[ORD] <- temp
   sigmaSq.hat
 }
-

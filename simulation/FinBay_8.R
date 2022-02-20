@@ -3,10 +3,10 @@ source("../R/F_Finite_Bayes.R")
 G <- 1000
 numSim <- 500
 n <- 6
-a <- -2
+a <- -2.5
 b <- 1
 prior <- 4
-PLOT=TRUE
+PLOT=FALSE
 
 F_FinBayes(G, numSim, n, prior, a, b, PLOT)
 
