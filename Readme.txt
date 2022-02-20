@@ -31,20 +31,9 @@ stored in the directory Data/
 (ii) Finite Bayes inference problem.
 simulation/FinBay_[1-8].R
 
-(iii) Comparison of the estimation of the mean parameters
-simulation/MeanComp_[1-8].R
-
-(iv) Comparison of the coverage probabilities of confidence intervals
-simulation/CI_Ind_[1-8].R
-
-(v) Concordance rate in the realdata analysis
+(iii) Concordance rate in the realdata analysis
 realdata/run_dataanalysis.R
 
-(vi) simulation via real data
-simulation_Data/Colon_n_5.R
-simulation_Data/Colon_n_10.R
-simulation_Data/Leukemia_n_5.R
-simulation_Data/Leukemia_n_10.R
 
 
 Warnings: when running the method REBayes, the function GVMix() might terminate and returns an error message.
