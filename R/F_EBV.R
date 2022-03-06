@@ -1,6 +1,14 @@
+## This is the main routine to compute the F-modeling based empirical Bayes estimator of the variances (F-EBV)
 
-# F-EBV Estimator
 FEB       <- function(sSq,df, K=10){
+  ## The function take three arguments
+  ## 1. sSq, the sample variances;
+  ## 2. df, the degree of freedom. In this function, the degree of freedom is a constant across all the sample variances;
+  ## 3. K, the parameters corresponding to the top K largest sample variances are estimator by the corresponding sample variance. By default, this value is taken as 10.
+
+  ## Output:
+  ## sigmaSq.hat, the FEBV estimator of the variances.
+  
   p        <- length(sSq)
   ORD      <- order(sSq)
   sSq.sort <- sSq[ORD]
