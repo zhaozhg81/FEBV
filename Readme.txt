@@ -3,6 +3,7 @@ The function is stored in the file:
 F_EBV.R
 
 Usage:
+source("R/F_EBV.R")
 FEB.est = FEB( sSq, df)
 
 sSq: the sample variances
